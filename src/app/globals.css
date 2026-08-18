@@ -3,6 +3,11 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  /* This app is light-only for now; force native form controls (select, input,
+     checkbox) to render with light-mode colors regardless of OS/browser dark
+     preference, since a dark preference otherwise makes their text nearly
+     invisible against our light backgrounds. */
+  color-scheme: light;
 }
 
 @theme inline {
@@ -12,15 +17,40 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  background-image:
+    radial-gradient(circle at 0% 0%, rgba(99, 102, 241, 0.06), transparent 45%),
+    radial-gradient(circle at 100% 0%, rgba(236, 72, 153, 0.05), transparent 40%);
+  background-attachment: fixed;
+}
+
+select,
+input,
+textarea {
+  color: var(--foreground);
+}
+
+@layer components {
+  .card {
+    @apply rounded-xl border border-neutral-200/80 bg-white shadow-sm shadow-neutral-200/50 transition;
+  }
+
+  .card-hover {
+    @apply hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md hover:shadow-indigo-100;
+  }
+
+  .btn-primary {
+    @apply rounded-lg bg-gradient-to-br from-indigo-600 to-violet-600 px-4 py-2 text-sm font-medium text-white shadow-sm shadow-indigo-300/50 transition hover:from-indigo-500 hover:to-violet-500 hover:shadow-md hover:shadow-indigo-300/60 disabled:opacity-50 disabled:hover:from-indigo-600 disabled:hover:to-violet-600;
+  }
+
+  .btn-secondary {
+    @apply rounded-lg border border-neutral-200 bg-white px-4 py-2 text-sm font-medium text-neutral-700 transition hover:border-neutral-300 hover:bg-neutral-50;
+  }
+
+  .input {
+    @apply w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm transition focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100;
+  }
 }
