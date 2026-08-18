@@ -13,7 +13,7 @@ export default async function LoginPage({
   searchParams: Promise<{ callbackUrl?: string }>;
 }) {
   const { callbackUrl } = await searchParams;
-  const isDev = process.env.NODE_ENV === "development";
+  const isDev = process.env.NODE_ENV === "development" || process.env.ALLOW_DEV_LOGIN === "true";
   const microsoftConfigured = Boolean(
     process.env.AUTH_MICROSOFT_ENTRA_ID_ID &&
       process.env.AUTH_MICROSOFT_ENTRA_ID_SECRET &&
@@ -62,7 +62,7 @@ export default async function LoginPage({
         {isDev && (
           <div className="space-y-3 border-t border-neutral-200 pt-5">
             <p className="text-center text-xs font-medium uppercase tracking-wide text-neutral-400">
-              Dev login (local only)
+              Dev login (test/staging only)
             </p>
             <div className="space-y-2">
               {devUsers.map((user) => (

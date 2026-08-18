@@ -25,11 +25,11 @@ if (
   );
 }
 
-// Dev-only shim: "log in as" any seeded user without a real Microsoft account.
-// Never registered outside development, and NextAuth's Credentials provider
-// requires a database session for us anyway, so role/managerId always come
-// straight from the User row.
-if (process.env.NODE_ENV === "development") {
+// Dev/test shim: "log in as" any seeded user without a real Microsoft account.
+// Gated by an explicit env var (never NODE_ENV alone) so it can be turned on
+// for a test/staging deployment without accidentally shipping to a real
+// production environment. Role/managerId always come straight from the User row.
+if (process.env.NODE_ENV === "development" || process.env.ALLOW_DEV_LOGIN === "true") {
   providers.push(
     Credentials({
       id: "dev-login",
@@ -48,9 +48,10 @@ if (process.env.NODE_ENV === "development") {
 }
 
 // Auth.js requires the JWT strategy whenever a Credentials provider is registered,
-// so the dev shim forces JWT locally; production (no Credentials provider) keeps
-// database sessions so role/managerId changes take effect without waiting on token expiry.
-const isDev = process.env.NODE_ENV === "development";
+// so the dev shim forces JWT whenever it's active; a real deployment with only the
+// Microsoft SSO provider keeps database sessions so role/managerId changes take
+// effect without waiting on token expiry.
+const isDev = process.env.NODE_ENV === "development" || process.env.ALLOW_DEV_LOGIN === "true";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
