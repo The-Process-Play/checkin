@@ -7,6 +7,10 @@
     {
       "path": "/api/cron/checkin-reminders?stage=chaser",
       "schedule": "0 12 * * 5"
+    },
+    {
+      "path": "/api/cron/feedback-360-reminder",
+      "schedule": "0 9 1 1,4,7,10 *"
     }
   ]
 }
