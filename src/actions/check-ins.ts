@@ -22,6 +22,7 @@ export async function submitCheckIn(input: {
   templateId: string;
   moodScore?: number;
   energyScore?: number;
+  lowScoreNote?: string;
   responses: CheckInResponseInput[];
   goalUpdate?: GoalUpdateInput;
 }) {
@@ -36,6 +37,7 @@ export async function submitCheckIn(input: {
     update: {
       moodScore: input.moodScore,
       energyScore: input.energyScore,
+      lowScoreNote: input.lowScoreNote,
       submittedAt: new Date(),
     },
     create: {
@@ -45,6 +47,7 @@ export async function submitCheckIn(input: {
       periodEnd,
       moodScore: input.moodScore,
       energyScore: input.energyScore,
+      lowScoreNote: input.lowScoreNote,
       submittedAt: new Date(),
     },
   });

@@ -1,11 +1,14 @@
 import { notFound } from "next/navigation";
+import { auth } from "@/auth";
 import { getOneOnOneById } from "@/actions/one-on-ones";
 import { NotesForm } from "@/components/one-on-ones/notes-form";
 import { ActionItems } from "@/components/one-on-ones/action-items";
+import { SeriesControls } from "@/components/one-on-ones/series-controls";
 import { formatDate } from "@/lib/date";
 
 export default async function OneOnOneDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const session = await auth();
   const oneOnOne = await getOneOnOneById(id);
   if (!oneOnOne) notFound();
 
@@ -17,6 +20,15 @@ export default async function OneOnOneDetailPage({ params }: { params: Promise<{
         </h1>
         <p className="text-sm text-neutral-500">{formatDate(oneOnOne.scheduledAt)}</p>
       </div>
+
+      {oneOnOne.series && (
+        <SeriesControls
+          oneOnOneId={oneOnOne.id}
+          scheduledAt={oneOnOne.scheduledAt}
+          series={oneOnOne.series}
+          isManager={session?.user.id === oneOnOne.managerId}
+        />
+      )}
 
       <NotesForm
         oneOnOneId={oneOnOne.id}

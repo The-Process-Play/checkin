@@ -29,6 +29,13 @@ export default async function CheckInDetailPage({ params }: { params: Promise<{ 
         )}
       </div>
 
+      {checkIn.lowScoreNote && (
+        <div className="card space-y-1 border-l-4 border-l-amber-300 p-4">
+          <p className="text-sm font-medium text-neutral-700">Additional context</p>
+          <p className="whitespace-pre-wrap text-sm text-neutral-600">{checkIn.lowScoreNote}</p>
+        </div>
+      )}
+
       <div className="space-y-4">
         {checkIn.responses
           .filter((r) => r.textValue)

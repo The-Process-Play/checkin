@@ -17,6 +17,13 @@ export default async function GoalDetailPage({ params }: { params: Promise<{ id:
 
       {goal.description && <p className="text-sm text-neutral-600">{goal.description}</p>}
 
+      {goal.supportNeeded && (
+        <div className="card space-y-1 border-l-4 border-l-violet-300 p-4">
+          <p className="text-xs uppercase tracking-wide text-neutral-400">Actions / support needed</p>
+          <p className="whitespace-pre-wrap text-sm text-neutral-700">{goal.supportNeeded}</p>
+        </div>
+      )}
+
       <div className="card grid grid-cols-3 divide-x divide-neutral-100 p-4 text-sm">
         <div className="px-3 first:pl-0">
           <p className="text-xs uppercase tracking-wide text-neutral-400">Type</p>

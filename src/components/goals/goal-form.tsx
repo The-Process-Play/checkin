@@ -10,6 +10,7 @@ export function GoalForm() {
   const [error, setError] = useState<string | null>(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [supportNeeded, setSupportNeeded] = useState("");
   const [type, setType] = useState<"INDIVIDUAL" | "TEAM">("INDIVIDUAL");
   const today = new Date().toISOString().slice(0, 10);
   const [startDate, setStartDate] = useState(today);
@@ -29,6 +30,7 @@ export function GoalForm() {
         const goal = await createGoal({
           title,
           description: description || undefined,
+          supportNeeded: supportNeeded || undefined,
           type,
           startDate: new Date(startDate),
           targetDate: new Date(targetDate),
@@ -59,6 +61,16 @@ export function GoalForm() {
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
+          rows={3}
+          className="input"
+        />
+      </div>
+
+      <div className="space-y-1.5">
+        <label className="text-sm font-medium text-neutral-700">Actions / support needed (optional)</label>
+        <textarea
+          value={supportNeeded}
+          onChange={(e) => setSupportNeeded(e.target.value)}
           rows={3}
           className="input"
         />

@@ -11,6 +11,8 @@ import { GoalsSummary } from "@/components/dashboard/goals-summary";
 import { ViewToggle } from "@/components/dashboard/view-toggle";
 import { EmployeeFilter } from "@/components/dashboard/employee-filter";
 import { StatTile } from "@/components/dashboard/stat-tile";
+import { getShoutoutCountsForUser } from "@/actions/shoutouts";
+import Link from "next/link";
 
 type SearchParams = { view?: string; employeeId?: string };
 
@@ -39,16 +41,24 @@ export default async function HomePage({
   );
 
   if (effectiveView === "me") {
-    const [currentWeek, goals, trend] = await Promise.all([
+    const [currentWeek, goals, trend, shoutoutCounts] = await Promise.all([
       getCurrentWeekCheckIn(),
       getMyGoals(),
       getMoodTrend([session.user.id]),
+      getShoutoutCountsForUser(session.user.id),
     ]);
 
     return (
       <div className="max-w-6xl space-y-8">
         {header}
         <CurrentWeekCard checkIn={currentWeek} />
+        <Link href="/shoutouts" className="card card-hover flex items-center gap-2 p-4 text-sm">
+          <span aria-hidden>🎉</span>
+          <span className="text-neutral-700">
+            You&apos;ve given <span className="font-semibold text-neutral-900">{shoutoutCounts.given}</span> and
+            received <span className="font-semibold text-neutral-900">{shoutoutCounts.received}</span> shout-outs
+          </span>
+        </Link>
         <div className="space-y-3">
           <h2 className="text-sm font-semibold text-neutral-900">My mood &amp; energy trend</h2>
           <MoodTrendChart data={trend} />

@@ -3,7 +3,14 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { createOneOnOne } from "@/actions/one-on-ones";
-import type { User } from "@prisma/client";
+import type { RecurrenceCadence, User } from "@prisma/client";
+
+const REPEAT_OPTIONS: { value: RecurrenceCadence | ""; label: string }[] = [
+  { value: "", label: "None" },
+  { value: "WEEKLY", label: "Weekly" },
+  { value: "BIWEEKLY", label: "Biweekly" },
+  { value: "MONTHLY", label: "Monthly" },
+];
 
 export function NewOneOnOneForm({ reports }: { reports: User[] }) {
   const router = useRouter();
@@ -12,6 +19,7 @@ export function NewOneOnOneForm({ reports }: { reports: User[] }) {
   const [reportId, setReportId] = useState(reports[0]?.id ?? "");
   const [scheduledAt, setScheduledAt] = useState(new Date().toISOString().slice(0, 10));
   const [agenda, setAgenda] = useState("");
+  const [cadence, setCadence] = useState<RecurrenceCadence | "">("");
 
   if (reports.length === 0) return null;
 
@@ -24,6 +32,7 @@ export function NewOneOnOneForm({ reports }: { reports: User[] }) {
           reportId,
           scheduledAt: new Date(scheduledAt),
           agenda: agenda || undefined,
+          recurrence: cadence ? { cadence } : undefined,
         });
         router.push(`/one-on-ones/${oneOnOne.id}`);
         router.refresh();
@@ -58,6 +67,20 @@ export function NewOneOnOneForm({ reports }: { reports: User[] }) {
           onChange={(e) => setScheduledAt(e.target.value)}
           className="input"
         />
+      </div>
+      <div className="space-y-1.5">
+        <label className="text-sm font-medium text-neutral-700">Repeats</label>
+        <select
+          value={cadence}
+          onChange={(e) => setCadence(e.target.value as RecurrenceCadence | "")}
+          className="input"
+        >
+          {REPEAT_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
       </div>
       <div className="space-y-1.5">
         <label className="text-sm font-medium text-neutral-700">Agenda (optional)</label>
