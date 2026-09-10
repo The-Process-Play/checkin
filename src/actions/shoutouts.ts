@@ -46,3 +46,30 @@ export async function getShoutoutCountsForUser(userId: string) {
   ]);
   return { given, received };
 }
+
+/** Top shout-out recipients (ties broken by who's given the most), all-time. */
+export async function getShoutoutLeaderboard(limit = 10) {
+  const session = await auth();
+  if (!session?.user) throw new Error("Not authenticated");
+
+  const [receivedCounts, givenCounts, users] = await Promise.all([
+    prisma.shoutout.groupBy({ by: ["toId"], _count: { toId: true } }),
+    prisma.shoutout.groupBy({ by: ["fromId"], _count: { fromId: true } }),
+    prisma.user.findMany({ where: { isActive: true }, select: { id: true, name: true, email: true } }),
+  ]);
+
+  const receivedMap = new Map(receivedCounts.map((r) => [r.toId, r._count.toId]));
+  const givenMap = new Map(givenCounts.map((g) => [g.fromId, g._count.fromId]));
+
+  return users
+    .map((u) => ({
+      id: u.id,
+      name: u.name,
+      email: u.email,
+      received: receivedMap.get(u.id) ?? 0,
+      given: givenMap.get(u.id) ?? 0,
+    }))
+    .filter((row) => row.received > 0 || row.given > 0)
+    .sort((a, b) => b.received - a.received || b.given - a.given)
+    .slice(0, limit);
+}
