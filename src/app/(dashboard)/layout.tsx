@@ -18,7 +18,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   return (
     <div className="flex min-h-screen bg-neutral-50">
-      <aside className="flex w-60 flex-col justify-between border-r border-neutral-200 bg-white/80 p-4 backdrop-blur-sm">
+      <aside className="flex w-60 flex-col justify-between border-r border-neutral-200 bg-white/80 p-4 backdrop-blur-sm dark:border-neutral-800 dark:bg-neutral-900/80">
         <div className="space-y-6">
           <div className="flex items-center gap-2 px-1">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 text-sm font-bold text-white shadow-sm shadow-indigo-300/60">
@@ -27,7 +27,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
             <p className="text-sm font-semibold text-neutral-900">TPP Check-In</p>
           </div>
 
-          <div className="flex items-center gap-3 rounded-xl bg-gradient-to-br from-indigo-50 to-violet-50 px-3 py-2.5">
+          <div className="flex items-center gap-3 rounded-xl bg-gradient-to-br from-indigo-50 to-violet-50 px-3 py-2.5 dark:from-indigo-950 dark:to-violet-950">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-xs font-bold text-white">
               {initials(session.user.name, session.user.email ?? "")}
             </div>
@@ -51,7 +51,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         >
           <button
             type="submit"
-            className="w-full rounded-lg px-3 py-2 text-left text-sm text-neutral-500 transition hover:bg-red-50 hover:text-red-600"
+            className="w-full rounded-lg px-3 py-2 text-left text-sm text-neutral-500 transition hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950"
           >
             Sign out
           </button>

@@ -1,13 +1,19 @@
 @import "tailwindcss";
 
+/* Enables the `dark:` variant to key off a `.dark` class on <html> (set by
+   the theme preference below) rather than only the OS-level media query. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  /* This app is light-only for now; force native form controls (select, input,
-     checkbox) to render with light-mode colors regardless of OS/browser dark
-     preference, since a dark preference otherwise makes their text nearly
-     invisible against our light backgrounds. */
   color-scheme: light;
+}
+
+:root.dark {
+  --background: #0a0a0b;
+  --foreground: #f4f4f5;
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -35,22 +41,78 @@ textarea {
 
 @layer components {
   .card {
-    @apply rounded-xl border border-neutral-200/80 bg-white shadow-sm shadow-neutral-200/50 transition;
+    @apply rounded-xl border border-neutral-200/80 bg-white shadow-sm shadow-neutral-200/50 transition dark:border-neutral-800 dark:bg-neutral-900 dark:shadow-none;
   }
 
   .card-hover {
-    @apply hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md hover:shadow-indigo-100;
+    @apply hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md hover:shadow-indigo-100 dark:hover:border-indigo-800 dark:hover:shadow-none;
   }
 
   .btn-primary {
-    @apply rounded-lg bg-gradient-to-br from-indigo-600 to-violet-600 px-4 py-2 text-sm font-medium text-white shadow-sm shadow-indigo-300/50 transition hover:from-indigo-500 hover:to-violet-500 hover:shadow-md hover:shadow-indigo-300/60 disabled:opacity-50 disabled:hover:from-indigo-600 disabled:hover:to-violet-600;
+    @apply rounded-lg bg-gradient-to-br from-indigo-600 to-violet-600 px-4 py-2 text-sm font-medium text-white shadow-sm shadow-indigo-300/50 transition hover:from-indigo-500 hover:to-violet-500 hover:shadow-md hover:shadow-indigo-300/60 disabled:opacity-50 disabled:hover:from-indigo-600 disabled:hover:to-violet-600 dark:shadow-none;
   }
 
   .btn-secondary {
-    @apply rounded-lg border border-neutral-200 bg-white px-4 py-2 text-sm font-medium text-neutral-700 transition hover:border-neutral-300 hover:bg-neutral-50;
+    @apply rounded-lg border border-neutral-200 bg-white px-4 py-2 text-sm font-medium text-neutral-700 transition hover:border-neutral-300 hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:border-neutral-600 dark:hover:bg-neutral-800;
   }
 
   .input {
-    @apply w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm transition focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100;
+    @apply w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm transition focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:border-neutral-700 dark:bg-neutral-900 dark:focus:border-indigo-500 dark:focus:ring-indigo-900;
   }
+}
+
+/*
+ * Most of the app's page/component markup uses plain Tailwind utility
+ * classes (text-neutral-900, bg-white, border-neutral-200, ...) directly
+ * rather than the semantic classes above. Rather than retrofitting `dark:`
+ * variants onto every one of those call sites, these rules re-theme the
+ * same utility classes globally whenever they're nested under `.dark` —
+ * one contained place to maintain, instead of a few hundred scattered edits.
+ * Higher selector specificity (two classes vs. one) means these win over
+ * Tailwind's own utilities without needing `!important`.
+ */
+.dark .bg-white {
+  background-color: #18181b;
+}
+.dark .bg-neutral-50 {
+  background-color: #18181b;
+}
+.dark .bg-neutral-100 {
+  background-color: #27272a;
+}
+.dark .border-neutral-100 {
+  border-color: #3f3f46;
+}
+.dark .border-neutral-200 {
+  border-color: #3f3f46;
+}
+.dark .border-neutral-300 {
+  border-color: #52525b;
+}
+.dark .divide-neutral-100 > :not([hidden]) ~ :not([hidden]) {
+  border-color: #3f3f46;
+}
+.dark .text-neutral-900 {
+  color: #f4f4f5;
+}
+.dark .text-neutral-800 {
+  color: #e4e4e7;
+}
+.dark .text-neutral-700 {
+  color: #d4d4d8;
+}
+.dark .text-neutral-600 {
+  color: #a1a1aa;
+}
+.dark .text-neutral-500 {
+  color: #a1a1aa;
+}
+.dark .text-neutral-400 {
+  color: #71717a;
+}
+.dark .from-neutral-900 {
+  --tw-gradient-from: #f4f4f5;
+}
+.dark .to-neutral-600 {
+  --tw-gradient-to: #a1a1aa;
 }

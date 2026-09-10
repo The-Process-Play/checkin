@@ -29,11 +29,11 @@ export default async function LoginPage({
     : [];
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-indigo-50 via-white to-violet-50 px-4">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-indigo-50 via-white to-violet-50 px-4 dark:from-indigo-950 dark:via-neutral-950 dark:to-violet-950">
       <div className="pointer-events-none absolute -top-24 -left-24 h-72 w-72 rounded-full bg-indigo-200/40 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-violet-200/40 blur-3xl" />
 
-      <div className="relative w-full max-w-sm space-y-6 rounded-2xl border border-neutral-200/80 bg-white/90 p-8 shadow-xl shadow-indigo-100 backdrop-blur-sm">
+      <div className="relative w-full max-w-sm space-y-6 rounded-2xl border border-neutral-200/80 bg-white/90 p-8 shadow-xl shadow-indigo-100 backdrop-blur-sm dark:border-neutral-800 dark:bg-neutral-900/90 dark:shadow-none">
         <div className="space-y-2 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-xl font-bold text-white shadow-md shadow-indigo-300/60">
             T

@@ -34,7 +34,7 @@ export function DashboardNav({ role }: { role: Role }) {
               className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition ${
                 active
                   ? "bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-sm shadow-indigo-300/50"
-                  : "text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900"
+                  : "text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-100"
               }`}
             >
               <span aria-hidden className="text-[15px] leading-none">

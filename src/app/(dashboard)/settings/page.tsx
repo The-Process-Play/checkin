@@ -13,6 +13,7 @@ export default async function SettingsPage() {
         initialName={prefs.name ?? ""}
         initialCheckInReminders={prefs.notifyCheckInReminders}
         initialWeeklyDigest={prefs.notifyWeeklyDigest}
+        initialTheme={prefs.theme}
       />
     </div>
   );
