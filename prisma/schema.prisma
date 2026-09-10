@@ -98,6 +98,10 @@ model User {
   isActive      Boolean   @default(true)
   createdAt     DateTime  @default(now())
 
+  // Notification preferences — self-managed, respected by every reminder/digest cron.
+  notifyCheckInReminders Boolean @default(true)
+  notifyWeeklyDigest     Boolean @default(true)
+
   managerId String?
   manager   User?   @relation("ManagerReports", fields: [managerId], references: [id], onDelete: SetNull)
   reports   User[]  @relation("ManagerReports")

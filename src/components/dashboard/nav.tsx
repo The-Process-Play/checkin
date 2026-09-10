@@ -15,6 +15,7 @@ const links = [
   { href: "/admin/dashboard", label: "Admin", icon: "📊", roles: ["ADMIN"] as Role[] },
   { href: "/admin/users", label: "Users", icon: "🧑‍💼", roles: ["ADMIN"] as Role[] },
   { href: "/admin/templates", label: "Templates", icon: "🗂️", roles: ["ADMIN"] as Role[] },
+  { href: "/settings", label: "Settings", icon: "⚙️", roles: ["EMPLOYEE", "MANAGER", "ADMIN"] as Role[] },
 ];
 
 export function DashboardNav({ role }: { role: Role }) {

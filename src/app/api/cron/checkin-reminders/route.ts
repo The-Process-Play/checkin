@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
   const periodStart = currentPeriodStart();
 
   const activeUsers = await prisma.user.findMany({
-    where: { isActive: true },
+    where: { isActive: true, notifyCheckInReminders: true },
     select: { id: true, email: true, name: true },
   });
 
