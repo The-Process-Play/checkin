@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Goal } from "@prisma/client";
+import { formatDate } from "@/lib/date";
 
 export function GoalsSummary({ goals, emptyHref }: { goals: Goal[]; emptyHref?: string }) {
   const active = goals.filter((g) => g.status !== "COMPLETED");
@@ -36,7 +37,7 @@ export function GoalsSummary({ goals, emptyHref }: { goals: Goal[]; emptyHref?: 
             />
           </div>
           <p className="mt-1.5 text-xs text-neutral-500">
-            Due {g.targetDate.toLocaleDateString()}
+            Due {formatDate(g.targetDate)}
           </p>
         </Link>
       ))}

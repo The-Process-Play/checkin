@@ -39,6 +39,17 @@ enum ActionItemStatus {
   DONE
 }
 
+enum RecurrenceCadence {
+  WEEKLY
+  BIWEEKLY
+  MONTHLY
+}
+
+enum FeedbackRequestStatus {
+  PENDING
+  COMPLETED
+}
+
 // --- Auth.js required models (Prisma adapter) ---
 model Account {
   id                String  @id @default(cuid())
@@ -101,6 +112,15 @@ model User {
   oneOnOnesAsRep OneOnOne[]   @relation("OneOnOneReport")
   actionItems    ActionItem[] @relation("ActionItemAssignee")
 
+  oneOnOneSeriesAsMgr OneOnOneSeries[] @relation("OneOnOneSeriesManager")
+  oneOnOneSeriesAsRep OneOnOneSeries[] @relation("OneOnOneSeriesReport")
+
+  shoutoutsGiven    Shoutout[] @relation("ShoutoutFrom")
+  shoutoutsReceived Shoutout[] @relation("ShoutoutTo")
+
+  feedbackRequestsAsSubject  FeedbackRequest[] @relation("FeedbackSubject")
+  feedbackRequestsAsReviewer FeedbackRequest[] @relation("FeedbackReviewer")
+
   @@index([managerId])
 }
 
@@ -137,12 +157,13 @@ model CheckIn {
   templateId String
   template   CheckInTemplate @relation(fields: [templateId], references: [id])
 
-  periodStart DateTime
-  periodEnd   DateTime
-  moodScore   Int?
-  energyScore Int?
-  submittedAt DateTime?
-  createdAt   DateTime  @default(now())
+  periodStart  DateTime
+  periodEnd    DateTime
+  moodScore    Int?
+  energyScore  Int?
+  lowScoreNote String?   @db.Text
+  submittedAt  DateTime?
+  createdAt    DateTime  @default(now())
 
   responses   CheckInResponse[]
   goalUpdates GoalUpdate[]
@@ -164,17 +185,18 @@ model CheckInResponse {
 }
 
 model Goal {
-  id          String     @id @default(cuid())
-  title       String
-  description String?    @db.Text
-  type        GoalType
-  status      GoalStatus @default(NOT_STARTED)
-  ownerId     String
-  owner       User       @relation("GoalOwner", fields: [ownerId], references: [id], onDelete: Cascade)
-  progress    Int        @default(0)
-  startDate   DateTime
-  targetDate  DateTime
-  createdAt   DateTime   @default(now())
+  id            String     @id @default(cuid())
+  title         String
+  description   String?    @db.Text
+  supportNeeded String?    @db.Text
+  type          GoalType
+  status        GoalStatus @default(NOT_STARTED)
+  ownerId       String
+  owner         User       @relation("GoalOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  progress      Int        @default(0)
+  startDate     DateTime
+  targetDate    DateTime
+  createdAt     DateTime   @default(now())
 
   updates GoalUpdate[]
 
@@ -196,6 +218,23 @@ model GoalUpdate {
   @@index([goalId])
 }
 
+model OneOnOneSeries {
+  id             String            @id @default(cuid())
+  managerId      String
+  manager        User              @relation("OneOnOneSeriesManager", fields: [managerId], references: [id], onDelete: Cascade)
+  reportId       String
+  report         User              @relation("OneOnOneSeriesReport", fields: [reportId], references: [id], onDelete: Cascade)
+  cadence        RecurrenceCadence
+  agendaTemplate String?           @db.Text
+  isActive       Boolean           @default(true)
+  createdAt      DateTime          @default(now())
+
+  instances OneOnOne[]
+
+  @@index([managerId])
+  @@index([reportId])
+}
+
 model OneOnOne {
   id          String   @id @default(cuid())
   managerId   String
@@ -207,10 +246,14 @@ model OneOnOne {
   notes       String?  @db.Text
   createdAt   DateTime @default(now())
 
+  seriesId String?
+  series   OneOnOneSeries? @relation(fields: [seriesId], references: [id], onDelete: SetNull)
+
   actionItems ActionItem[]
 
   @@index([managerId])
   @@index([reportId])
+  @@index([seriesId])
 }
 
 model ActionItem {
@@ -225,4 +268,43 @@ model ActionItem {
   createdAt   DateTime         @default(now())
 
   @@index([oneOnOneId])
+}
+
+model Shoutout {
+  id        String   @id @default(cuid())
+  fromId    String
+  from      User     @relation("ShoutoutFrom", fields: [fromId], references: [id], onDelete: Cascade)
+  toId      String
+  to        User     @relation("ShoutoutTo", fields: [toId], references: [id], onDelete: Cascade)
+  message   String   @db.Text
+  createdAt DateTime @default(now())
+
+  @@index([fromId])
+  @@index([toId])
+  @@index([toId, createdAt])
+}
+
+model FeedbackRequest {
+  id         String                @id @default(cuid())
+  subjectId  String
+  subject    User                  @relation("FeedbackSubject", fields: [subjectId], references: [id], onDelete: Cascade)
+  reviewerId String
+  reviewer   User                  @relation("FeedbackReviewer", fields: [reviewerId], references: [id], onDelete: Cascade)
+  status     FeedbackRequestStatus @default(PENDING)
+  createdAt  DateTime              @default(now())
+
+  response FeedbackResponse?
+
+  @@index([subjectId])
+  @@index([reviewerId])
+}
+
+model FeedbackResponse {
+  id                 String          @id @default(cuid())
+  requestId          String          @unique
+  request            FeedbackRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  strengths          String          @db.Text
+  areasToImprove     String          @db.Text
+  additionalComments String?         @db.Text
+  submittedAt        DateTime        @default(now())
 }

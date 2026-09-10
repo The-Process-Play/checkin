@@ -9,6 +9,8 @@ const links = [
   { href: "/check-ins", label: "Check-Ins", icon: "📝", roles: ["EMPLOYEE", "MANAGER", "ADMIN"] as Role[] },
   { href: "/goals", label: "Goals", icon: "🎯", roles: ["EMPLOYEE", "MANAGER", "ADMIN"] as Role[] },
   { href: "/one-on-ones", label: "1:1s", icon: "💬", roles: ["EMPLOYEE", "MANAGER", "ADMIN"] as Role[] },
+  { href: "/shoutouts", label: "Shout-Outs", icon: "🎉", roles: ["EMPLOYEE", "MANAGER", "ADMIN"] as Role[] },
+  { href: "/feedback-360", label: "360 Feedback", icon: "🔄", roles: ["EMPLOYEE", "MANAGER", "ADMIN"] as Role[] },
   { href: "/team", label: "Team", icon: "👥", roles: ["MANAGER", "ADMIN"] as Role[] },
   { href: "/admin/dashboard", label: "Admin", icon: "📊", roles: ["ADMIN"] as Role[] },
   { href: "/admin/users", label: "Users", icon: "🧑‍💼", roles: ["ADMIN"] as Role[] },

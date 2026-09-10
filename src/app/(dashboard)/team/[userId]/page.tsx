@@ -5,7 +5,9 @@ import { prisma } from "@/lib/prisma";
 import { canAccessUserData } from "@/lib/authz";
 import { getCheckInHistoryForUser } from "@/actions/check-ins";
 import { getGoalsForUser } from "@/actions/goals";
+import { getFeedbackForSubject } from "@/actions/feedback-360";
 import { formatPeriod } from "@/lib/period";
+import { formatDate } from "@/lib/date";
 
 export default async function TeamMemberPage({ params }: { params: Promise<{ userId: string }> }) {
   const { userId } = await params;
@@ -19,9 +21,10 @@ export default async function TeamMemberPage({ params }: { params: Promise<{ use
   const allowed = await canAccessUserData(session.user, userId);
   if (!allowed) notFound();
 
-  const [checkIns, goals] = await Promise.all([
+  const [checkIns, goals, feedback] = await Promise.all([
     getCheckInHistoryForUser(userId),
     getGoalsForUser(userId),
+    getFeedbackForSubject(userId),
   ]);
 
   return (
@@ -62,12 +65,36 @@ export default async function TeamMemberPage({ params }: { params: Promise<{ use
               <span className="text-neutral-500">{g.progress}%</span>
             </div>
             <p className="mt-1 text-xs text-neutral-500">
-              {g.type === "TEAM" ? "Team goal" : "Individual goal"} · Due {g.targetDate.toLocaleDateString()}
+              {g.type === "TEAM" ? "Team goal" : "Individual goal"} · Due {formatDate(g.targetDate)}
             </p>
           </Link>
         ))}
         {goals.length === 0 && (
           <div className="card p-4 text-center text-sm text-neutral-500">No goals yet.</div>
+        )}
+      </div>
+
+      <div className="space-y-3">
+        <h2 className="text-sm font-semibold text-neutral-900">360 feedback</h2>
+        {feedback.map((req) => (
+          <div key={req.id} className="card p-4 text-sm">
+            <p className="text-xs text-neutral-500">From {req.reviewer.name ?? req.reviewer.email}</p>
+            {req.response && (
+              <div className="mt-2 space-y-2">
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wide text-neutral-400">Strengths</p>
+                  <p className="text-neutral-700">{req.response.strengths}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wide text-neutral-400">Areas to improve</p>
+                  <p className="text-neutral-700">{req.response.areasToImprove}</p>
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+        {feedback.length === 0 && (
+          <div className="card p-4 text-center text-sm text-neutral-500">No completed feedback yet.</div>
         )}
       </div>
     </div>

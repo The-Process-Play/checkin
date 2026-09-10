@@ -19,6 +19,7 @@ export function CheckInForm({
   initial?: {
     moodScore?: number | null;
     energyScore?: number | null;
+    lowScoreNote?: string | null;
     responses: Record<string, { textValue?: string | null; scaleValue?: number | null }>;
   };
 }) {
@@ -27,6 +28,8 @@ export function CheckInForm({
   const [error, setError] = useState<string | null>(null);
   const [mood, setMood] = useState<number | undefined>(initial?.moodScore ?? undefined);
   const [energy, setEnergy] = useState<number | undefined>(initial?.energyScore ?? undefined);
+  const [lowScoreNote, setLowScoreNote] = useState(initial?.lowScoreNote ?? "");
+  const showLowScorePrompt = (mood != null && mood <= 2) || (energy != null && energy <= 2);
   const [texts, setTexts] = useState<Record<string, string>>(() => {
     const map: Record<string, string> = {};
     for (const q of questions) {
@@ -52,6 +55,10 @@ export function CheckInForm({
           templateId,
           moodScore: mood,
           energyScore: energy,
+          // Only send the low-score note while it's actually visible — if the user
+          // raises their score back above the threshold before submitting, don't
+          // silently send stale hidden text.
+          lowScoreNote: showLowScorePrompt && lowScoreNote ? lowScoreNote : undefined,
           responses,
           goalUpdate: selectedGoalId
             ? { goalId: selectedGoalId, progress: goalProgress, note: goalNote || undefined }
@@ -69,6 +76,20 @@ export function CheckInForm({
     <form onSubmit={handleSubmit} className="space-y-6">
       <ScaleField label="Mood this week" value={mood} onChange={setMood} />
       <ScaleField label="Energy this week" value={energy} onChange={setEnergy} />
+
+      {showLowScorePrompt && (
+        <div className="card space-y-1.5 border-l-4 border-l-amber-300 p-4">
+          <label className="text-sm font-medium text-neutral-700">
+            Sorry to hear that — can you tell us more? (optional)
+          </label>
+          <textarea
+            value={lowScoreNote}
+            onChange={(e) => setLowScoreNote(e.target.value)}
+            rows={2}
+            className="input"
+          />
+        </div>
+      )}
 
       {questions
         .filter((q) => q.type === "TEXT")

@@ -19,6 +19,36 @@ export async function getAllUsers() {
   });
 }
 
+export async function createUser(input: {
+  email: string;
+  name?: string;
+  role: Role;
+  managerId?: string | null;
+  title?: string;
+  department?: string;
+}) {
+  await assertAdmin();
+  const email = input.email.trim().toLowerCase();
+  if (!email) throw new Error("Email is required");
+
+  const existing = await prisma.user.findUnique({ where: { email } });
+  if (existing) throw new Error("A user with this email already exists");
+
+  const user = await prisma.user.create({
+    data: {
+      email,
+      name: input.name?.trim() || null,
+      role: input.role,
+      managerId: input.managerId || null,
+      title: input.title?.trim() || null,
+      department: input.department?.trim() || null,
+    },
+  });
+
+  revalidatePath("/admin/users");
+  return user;
+}
+
 export async function updateUserRole(userId: string, role: Role) {
   await assertAdmin();
   await prisma.user.update({ where: { id: userId }, data: { role } });

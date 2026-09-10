@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getMyGoals } from "@/actions/goals";
+import { formatDate } from "@/lib/date";
 
 const statusColor: Record<string, string> = {
   NOT_STARTED: "bg-neutral-100 text-neutral-600",
@@ -44,7 +45,7 @@ export default async function GoalsPage() {
             <div className="mt-1 flex justify-between text-xs text-neutral-500">
               <span>{goal.progress}% complete</span>
               <span>
-                {goal.startDate.toLocaleDateString()} → {goal.targetDate.toLocaleDateString()}
+                {formatDate(goal.startDate)} → {formatDate(goal.targetDate)}
               </span>
             </div>
           </Link>

@@ -9,6 +9,7 @@ import { GoalStatus, GoalType } from "@prisma/client";
 export async function createGoal(input: {
   title: string;
   description?: string;
+  supportNeeded?: string;
   type: GoalType;
   startDate: Date;
   targetDate: Date;
@@ -20,6 +21,7 @@ export async function createGoal(input: {
     data: {
       title: input.title,
       description: input.description,
+      supportNeeded: input.supportNeeded,
       type: input.type,
       startDate: input.startDate,
       targetDate: input.targetDate,

@@ -34,6 +34,7 @@ export default async function NewCheckInPage() {
             ? {
                 moodScore: currentWeek.moodScore,
                 energyScore: currentWeek.energyScore,
+                lowScoreNote: currentWeek.lowScoreNote,
                 responses: responsesByQuestion,
               }
             : undefined
