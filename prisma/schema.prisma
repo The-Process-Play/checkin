@@ -269,6 +269,7 @@ model ActionItem {
   description String
   status      ActionItemStatus @default(OPEN)
   dueDate     DateTime?
+  note        String?          @db.Text
   createdAt   DateTime         @default(now())
 
   @@index([oneOnOneId])

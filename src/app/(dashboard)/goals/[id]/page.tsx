@@ -11,8 +11,18 @@ export default async function GoalDetailPage({ params }: { params: Promise<{ id:
   return (
     <div className="max-w-6xl space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-neutral-900">{goal.title}</h1>
-        <p className="text-sm text-neutral-500">{goal.owner.name ?? goal.owner.email}</p>
+        <div className="flex items-center gap-2">
+          <h1 className="text-2xl font-semibold text-neutral-900">{goal.title}</h1>
+          {goal.type === "TEAM" && (
+            <span className="rounded-full bg-violet-100 px-2.5 py-1 text-xs font-medium text-violet-700">
+              Team goal
+            </span>
+          )}
+        </div>
+        <p className="text-sm text-neutral-500">
+          {goal.owner.name ?? goal.owner.email}
+          {goal.type === "TEAM" && " · shared with the team — anyone can update progress"}
+        </p>
       </div>
 
       {goal.description && <p className="text-sm text-neutral-600">{goal.description}</p>}

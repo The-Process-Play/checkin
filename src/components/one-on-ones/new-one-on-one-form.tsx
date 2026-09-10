@@ -12,16 +12,24 @@ const REPEAT_OPTIONS: { value: RecurrenceCadence | ""; label: string }[] = [
   { value: "MONTHLY", label: "Monthly" },
 ];
 
-export function NewOneOnOneForm({ reports }: { reports: User[] }) {
+export function NewOneOnOneForm({
+  counterparts,
+  counterpartLabel,
+  title,
+}: {
+  counterparts: User[];
+  counterpartLabel: string;
+  title: string;
+}) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
-  const [reportId, setReportId] = useState(reports[0]?.id ?? "");
+  const [withUserId, setWithUserId] = useState(counterparts[0]?.id ?? "");
   const [scheduledAt, setScheduledAt] = useState(new Date().toISOString().slice(0, 10));
   const [agenda, setAgenda] = useState("");
   const [cadence, setCadence] = useState<RecurrenceCadence | "">("");
 
-  if (reports.length === 0) return null;
+  if (counterparts.length === 0) return null;
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -29,7 +37,7 @@ export function NewOneOnOneForm({ reports }: { reports: User[] }) {
     startTransition(async () => {
       try {
         const oneOnOne = await createOneOnOne({
-          reportId,
+          withUserId,
           scheduledAt: new Date(scheduledAt),
           agenda: agenda || undefined,
           recurrence: cadence ? { cadence } : undefined,
@@ -44,17 +52,17 @@ export function NewOneOnOneForm({ reports }: { reports: User[] }) {
 
   return (
     <form onSubmit={handleSubmit} className="card space-y-4 border-l-4 border-l-violet-300 p-4">
-      <h2 className="text-sm font-semibold text-neutral-900">Schedule a new 1:1</h2>
+      <h2 className="text-sm font-semibold text-neutral-900">{title}</h2>
       <div className="space-y-1.5">
-        <label className="text-sm font-medium text-neutral-700">Report</label>
+        <label className="text-sm font-medium text-neutral-700">{counterpartLabel}</label>
         <select
-          value={reportId}
-          onChange={(e) => setReportId(e.target.value)}
+          value={withUserId}
+          onChange={(e) => setWithUserId(e.target.value)}
           className="input"
         >
-          {reports.map((r) => (
-            <option key={r.id} value={r.id}>
-              {r.name ?? r.email}
+          {counterparts.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name ?? c.email}
             </option>
           ))}
         </select>

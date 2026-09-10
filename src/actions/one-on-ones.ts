@@ -79,8 +79,22 @@ export async function getMyDirectReports() {
   });
 }
 
+export async function getMyManager() {
+  const session = await auth();
+  if (!session?.user) throw new Error("Not authenticated");
+  if (!session.user.managerId) return null;
+
+  return prisma.user.findUnique({ where: { id: session.user.managerId } });
+}
+
+/**
+ * Either side of a manager/report pair can schedule a 1:1 — a manager
+ * scheduling with a direct report, or an employee scheduling with their own
+ * manager. `withUserId` is always "the other person"; the direction (who's
+ * manager, who's report) is inferred from the existing reporting relationship.
+ */
 export async function createOneOnOne(input: {
-  reportId: string;
+  withUserId: string;
   scheduledAt: Date;
   agenda?: string;
   recurrence?: { cadence: RecurrenceCadence };
@@ -88,17 +102,29 @@ export async function createOneOnOne(input: {
   const session = await auth();
   if (!session?.user) throw new Error("Not authenticated");
 
-  const report = await prisma.user.findUnique({ where: { id: input.reportId } });
-  if (!report || report.managerId !== session.user.id) {
-    throw new Error("You can only schedule 1:1s with your direct reports");
+  const other = await prisma.user.findUnique({ where: { id: input.withUserId } });
+  if (!other) throw new Error("User not found");
+
+  let managerId: string;
+  let reportId: string;
+  if (other.managerId === session.user.id) {
+    // I manage them.
+    managerId = session.user.id;
+    reportId = other.id;
+  } else if (session.user.managerId === other.id) {
+    // They manage me.
+    managerId = other.id;
+    reportId = session.user.id;
+  } else {
+    throw new Error("You can only schedule 1:1s with your manager or your direct reports");
   }
 
   let seriesId: string | undefined;
   if (input.recurrence) {
     const series = await prisma.oneOnOneSeries.create({
       data: {
-        managerId: session.user.id,
-        reportId: input.reportId,
+        managerId,
+        reportId,
         cadence: input.recurrence.cadence,
         agendaTemplate: input.agenda,
       },
@@ -108,8 +134,8 @@ export async function createOneOnOne(input: {
 
   const oneOnOne = await prisma.oneOnOne.create({
     data: {
-      managerId: session.user.id,
-      reportId: input.reportId,
+      managerId,
+      reportId,
       scheduledAt: input.scheduledAt,
       agenda: input.agenda,
       seriesId,
@@ -192,6 +218,32 @@ export async function toggleActionItem(actionItemId: string) {
   await prisma.actionItem.update({
     where: { id: actionItemId },
     data: { status: item.status === ActionItemStatus.OPEN ? ActionItemStatus.DONE : ActionItemStatus.OPEN },
+  });
+
+  revalidatePath(`/one-on-ones/${item.oneOnOneId}`);
+}
+
+/**
+ * Log a free-text progress note on an action item without changing its
+ * OPEN/DONE status — for when it's still outstanding by the next 1:1 but
+ * there's progress worth recording. Deliberately a single mutable note
+ * rather than a full update history, keeping action items short-term/simple
+ * (goals are the place for that level of tracking).
+ */
+export async function updateActionItemNote(actionItemId: string, note: string) {
+  const session = await auth();
+  if (!session?.user) throw new Error("Not authenticated");
+
+  const item = await prisma.actionItem.findUnique({
+    where: { id: actionItemId },
+    include: { oneOnOne: true },
+  });
+  if (!item) throw new Error("Action item not found");
+  if (!canAccessOneOnOne(session.user, item.oneOnOne)) throw new Error("Not authorized");
+
+  await prisma.actionItem.update({
+    where: { id: actionItemId },
+    data: { note: note || null },
   });
 
   revalidatePath(`/one-on-ones/${item.oneOnOneId}`);

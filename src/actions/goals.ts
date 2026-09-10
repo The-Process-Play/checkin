@@ -2,7 +2,7 @@
 
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { canAccessUserData } from "@/lib/authz";
+import { canAccessUserData, canAccessGoal, getTeamUserIds } from "@/lib/authz";
 import { revalidatePath } from "next/cache";
 import { GoalStatus, GoalType } from "@prisma/client";
 
@@ -52,7 +52,7 @@ export async function updateGoalProgress(input: {
   const goal = await prisma.goal.findUnique({ where: { id: input.goalId } });
   if (!goal) throw new Error("Goal not found");
 
-  const allowed = await canAccessUserData(session.user, goal.ownerId);
+  const allowed = await canAccessGoal(session.user, goal);
   if (!allowed) throw new Error("Not authorized to update this goal");
 
   const progress = Math.max(0, Math.min(100, input.progress));
@@ -128,8 +128,22 @@ export async function getGoalById(id: string) {
   });
   if (!goal) return null;
 
-  const allowed = await canAccessUserData(session.user, goal.ownerId);
+  const allowed = await canAccessGoal(session.user, goal);
   if (!allowed) return null;
 
   return goal;
+}
+
+/** TEAM-type goals owned by anyone on the viewer's immediate team (see getTeamUserIds). */
+export async function getTeamGoals() {
+  const session = await auth();
+  if (!session?.user) throw new Error("Not authenticated");
+
+  const teamIds = await getTeamUserIds(session.user);
+
+  return prisma.goal.findMany({
+    where: { type: "TEAM", ownerId: { in: teamIds } },
+    include: { owner: true },
+    orderBy: { targetDate: "asc" },
+  });
 }

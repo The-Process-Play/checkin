@@ -1,14 +1,15 @@
 import Link from "next/link";
 import { auth } from "@/auth";
-import { getMyOneOnOnes, getMyDirectReports } from "@/actions/one-on-ones";
+import { getMyOneOnOnes, getMyDirectReports, getMyManager } from "@/actions/one-on-ones";
 import { NewOneOnOneForm } from "@/components/one-on-ones/new-one-on-one-form";
 import { formatDate } from "@/lib/date";
 
 export default async function OneOnOnesPage() {
   const session = await auth();
-  const [oneOnOnes, reports] = await Promise.all([
+  const [oneOnOnes, reports, manager] = await Promise.all([
     getMyOneOnOnes(),
-    session?.user.role !== "EMPLOYEE" ? getMyDirectReports() : Promise.resolve([]),
+    getMyDirectReports(),
+    getMyManager(),
   ]);
 
   return (
@@ -17,7 +18,16 @@ export default async function OneOnOnesPage() {
         1:1s
       </h1>
 
-      {reports.length > 0 && <NewOneOnOneForm reports={reports} />}
+      {reports.length > 0 && (
+        <NewOneOnOneForm counterparts={reports} counterpartLabel="Report" title="Schedule a 1:1 with a report" />
+      )}
+      {manager && (
+        <NewOneOnOneForm
+          counterparts={[manager]}
+          counterpartLabel="Manager"
+          title="Schedule a 1:1 with your manager"
+        />
+      )}
 
       <div className="space-y-3">
         {oneOnOnes.map((o) => {
