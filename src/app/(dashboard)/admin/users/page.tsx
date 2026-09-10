@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { getAllUsers } from "@/actions/admin";
 import { UserRow } from "@/components/admin/user-row";
+import { NewUserForm } from "@/components/admin/new-user-form";
 
 export default async function AdminUsersPage() {
   const session = await auth();
@@ -15,6 +16,8 @@ export default async function AdminUsersPage() {
       <h1 className="bg-gradient-to-r from-neutral-900 to-neutral-600 bg-clip-text text-2xl font-semibold text-transparent">
         Users
       </h1>
+
+      <NewUserForm potentialManagers={potentialManagers} />
 
       <div className="card overflow-x-auto">
         <table className="w-full text-sm">

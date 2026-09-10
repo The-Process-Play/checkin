@@ -6,6 +6,7 @@ import { canAccessUserData } from "@/lib/authz";
 import { getCheckInHistoryForUser } from "@/actions/check-ins";
 import { getGoalsForUser } from "@/actions/goals";
 import { formatPeriod } from "@/lib/period";
+import { formatDate } from "@/lib/date";
 
 export default async function TeamMemberPage({ params }: { params: Promise<{ userId: string }> }) {
   const { userId } = await params;
@@ -62,7 +63,7 @@ export default async function TeamMemberPage({ params }: { params: Promise<{ use
               <span className="text-neutral-500">{g.progress}%</span>
             </div>
             <p className="mt-1 text-xs text-neutral-500">
-              {g.type === "TEAM" ? "Team goal" : "Individual goal"} · Due {g.targetDate.toLocaleDateString()}
+              {g.type === "TEAM" ? "Team goal" : "Individual goal"} · Due {formatDate(g.targetDate)}
             </p>
           </Link>
         ))}

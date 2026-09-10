@@ -2,6 +2,7 @@ import Link from "next/link";
 import { auth } from "@/auth";
 import { getMyOneOnOnes, getMyDirectReports } from "@/actions/one-on-ones";
 import { NewOneOnOneForm } from "@/components/one-on-ones/new-one-on-one-form";
+import { formatDate } from "@/lib/date";
 
 export default async function OneOnOnesPage() {
   const session = await auth();
@@ -27,7 +28,7 @@ export default async function OneOnOnesPage() {
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-neutral-900">{other.name ?? other.email}</span>
                 <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs text-neutral-500">
-                  {o.scheduledAt.toLocaleDateString()}
+                  {formatDate(o.scheduledAt)}
                 </span>
               </div>
               {o.agenda && <p className="mt-1 text-xs text-neutral-500">{o.agenda}</p>}

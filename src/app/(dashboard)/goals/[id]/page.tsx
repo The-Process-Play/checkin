@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getGoalById } from "@/actions/goals";
 import { GoalProgressForm } from "@/components/goals/goal-progress-form";
+import { formatDate } from "@/lib/date";
 
 export default async function GoalDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -25,11 +26,11 @@ export default async function GoalDetailPage({ params }: { params: Promise<{ id:
         </div>
         <div className="px-3">
           <p className="text-xs uppercase tracking-wide text-neutral-400">Start date</p>
-          <p className="mt-1 font-medium text-neutral-800">{goal.startDate.toLocaleDateString()}</p>
+          <p className="mt-1 font-medium text-neutral-800">{formatDate(goal.startDate)}</p>
         </div>
         <div className="px-3">
           <p className="text-xs uppercase tracking-wide text-neutral-400">Target date</p>
-          <p className="mt-1 font-medium text-neutral-800">{goal.targetDate.toLocaleDateString()}</p>
+          <p className="mt-1 font-medium text-neutral-800">{formatDate(goal.targetDate)}</p>
         </div>
       </div>
 
@@ -53,7 +54,7 @@ export default async function GoalDetailPage({ params }: { params: Promise<{ id:
           <div key={update.id} className="card p-3 text-sm">
             <div className="flex justify-between text-xs text-neutral-500">
               <span>{update.author.name ?? update.author.email}</span>
-              <span>{update.createdAt.toLocaleDateString()}</span>
+              <span>{formatDate(update.createdAt)}</span>
             </div>
             <p className="mt-1 text-neutral-700">
               {update.progress}%{update.note ? ` — ${update.note}` : ""}

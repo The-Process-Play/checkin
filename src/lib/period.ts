@@ -11,5 +11,5 @@ export function periodEndFor(periodStart: Date): Date {
 }
 
 export function formatPeriod(periodStart: Date): string {
-  return periodStart.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  return periodStart.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
 }
