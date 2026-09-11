@@ -29,6 +29,10 @@ export async function submitCheckIn(input: {
   const session = await auth();
   if (!session?.user) throw new Error("Not authenticated");
 
+  if (input.moodScore == null || input.energyScore == null) {
+    throw new Error("Mood and energy scores are required");
+  }
+
   const periodStart = currentPeriodStart();
   const periodEnd = periodEndFor(periodStart);
 

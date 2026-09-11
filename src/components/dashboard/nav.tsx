@@ -18,7 +18,7 @@ const links = [
   { href: "/settings", label: "Settings", icon: "⚙️", roles: ["EMPLOYEE", "MANAGER", "ADMIN"] as Role[] },
 ];
 
-export function DashboardNav({ role }: { role: Role }) {
+export function DashboardNav({ role, pendingFeedbackCount = 0 }: { role: Role; pendingFeedbackCount?: number }) {
   const pathname = usePathname();
 
   return (
@@ -40,7 +40,16 @@ export function DashboardNav({ role }: { role: Role }) {
               <span aria-hidden className="text-[15px] leading-none">
                 {link.icon}
               </span>
-              {link.label}
+              <span className="flex-1">{link.label}</span>
+              {link.href === "/feedback-360" && pendingFeedbackCount > 0 && (
+                <span
+                  className={`flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[11px] font-semibold ${
+                    active ? "bg-white/25 text-white" : "bg-red-500 text-white"
+                  }`}
+                >
+                  {pendingFeedbackCount}
+                </span>
+              )}
             </Link>
           );
         })}

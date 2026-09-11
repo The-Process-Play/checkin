@@ -37,7 +37,10 @@ export function TeamStatusTable({ members }: { members: TeamMemberStatus[] }) {
               </td>
               <td className="px-4 py-3">
                 {m.atRisk ? (
-                  <span className="rounded-full bg-red-100 px-2.5 py-1 text-xs font-medium text-red-700">
+                  <span
+                    title={m.atRiskReason ?? undefined}
+                    className="cursor-help rounded-full bg-red-100 px-2.5 py-1 text-xs font-medium text-red-700"
+                  >
                     At risk
                   </span>
                 ) : (

@@ -36,7 +36,9 @@ export default async function OneOnOnesPage() {
           return (
             <Link key={o.id} href={`/one-on-ones/${o.id}`} className="card card-hover block p-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-neutral-900">{other.name ?? other.email}</span>
+                <span className="text-sm font-medium text-neutral-900">
+                  Your 1:1 with {other.name ?? other.email}
+                </span>
                 <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs text-neutral-500">
                   {formatDate(o.scheduledAt)}
                 </span>

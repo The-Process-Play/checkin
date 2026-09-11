@@ -14,6 +14,8 @@ export type TeamMemberStatus = {
   recentAvgMood: number | null;
   consecutiveMissedPeriods: number;
   atRisk: boolean;
+  /** Human-readable explanation of why atRisk is true, or null when it's false. */
+  atRiskReason: string | null;
 };
 
 export async function getTeamStatus(userIds: string[]): Promise<TeamMemberStatus[]> {
@@ -52,9 +54,18 @@ export async function getTeamStatus(userIds: string[]): Promise<TeamMemberStatus
       consecutiveMissedPeriods++;
     }
 
-    const atRisk =
-      (recentAvgMood != null && recentAvgMood < AT_RISK_MOOD_THRESHOLD) ||
-      consecutiveMissedPeriods >= MISSED_PERIODS_THRESHOLD;
+    const lowMood = recentAvgMood != null && recentAvgMood < AT_RISK_MOOD_THRESHOLD;
+    const tooManyMissed = consecutiveMissedPeriods >= MISSED_PERIODS_THRESHOLD;
+    const atRisk = lowMood || tooManyMissed;
+
+    let atRiskReason: string | null = null;
+    if (lowMood && tooManyMissed) {
+      atRiskReason = `Recent mood is low (${recentAvgMood!.toFixed(1)}/5) and ${consecutiveMissedPeriods} check-ins in a row have been missed.`;
+    } else if (lowMood) {
+      atRiskReason = `Recent mood is low (${recentAvgMood!.toFixed(1)}/5, over the last ${MOOD_LOOKBACK_CHECKINS} check-ins).`;
+    } else if (tooManyMissed) {
+      atRiskReason = `${consecutiveMissedPeriods} check-ins in a row have been missed.`;
+    }
 
     results.push({
       id: user.id,
@@ -65,6 +76,7 @@ export async function getTeamStatus(userIds: string[]): Promise<TeamMemberStatus
       recentAvgMood,
       consecutiveMissedPeriods,
       atRisk,
+      atRiskReason,
     });
   }
 

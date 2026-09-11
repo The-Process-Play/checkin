@@ -2,14 +2,24 @@ import Link from "next/link";
 import type { Goal } from "@prisma/client";
 import { formatDate } from "@/lib/date";
 
-export function GoalsSummary({ goals, emptyHref }: { goals: Goal[]; emptyHref?: string }) {
+type GoalWithOptionalOwner = Goal & { owner?: { name: string | null; email: string } };
+
+export function GoalsSummary({
+  goals,
+  emptyHref,
+  emptyMessage,
+}: {
+  goals: GoalWithOptionalOwner[];
+  emptyHref?: string;
+  emptyMessage?: string;
+}) {
   const active = goals.filter((g) => g.status !== "COMPLETED");
 
   if (active.length === 0) {
     return (
       <div className="card p-5 text-center">
         <p className="text-sm text-neutral-500">
-          No active goals.{" "}
+          {emptyMessage ?? "No active goals."}{" "}
           {emptyHref && (
             <Link href={emptyHref} className="font-medium text-indigo-600 hover:underline">
               Create one
@@ -25,7 +35,14 @@ export function GoalsSummary({ goals, emptyHref }: { goals: Goal[]; emptyHref?: 
       {active.map((g) => (
         <Link key={g.id} href={`/goals/${g.id}`} className="card card-hover block p-4">
           <div className="flex items-center justify-between text-sm">
-            <span className="font-medium text-neutral-900">{g.title}</span>
+            <span className="font-medium text-neutral-900">
+              {g.title}
+              {g.owner && (
+                <span className="ml-1.5 font-normal text-neutral-400">
+                  · {g.owner.name ?? g.owner.email}
+                </span>
+              )}
+            </span>
             <span className="rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-semibold text-indigo-700">
               {g.progress}%
             </span>
