@@ -1,6 +1,7 @@
 import { auth, signOut } from "@/auth";
 import { redirect } from "next/navigation";
 import { DashboardNav } from "@/components/dashboard/nav";
+import { getPendingReviewsForMe } from "@/actions/feedback-360";
 
 function initials(name: string | null | undefined, email: string) {
   const source = name ?? email;
@@ -15,6 +16,8 @@ function initials(name: string | null | undefined, email: string) {
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
   if (!session?.user) redirect("/login");
+
+  const pendingReviews = await getPendingReviewsForMe();
 
   return (
     <div className="flex min-h-screen bg-neutral-50">
@@ -41,7 +44,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
             </div>
           </div>
 
-          <DashboardNav role={session.user.role} />
+          <DashboardNav role={session.user.role} pendingFeedbackCount={pendingReviews.length} />
         </div>
         <form
           action={async () => {

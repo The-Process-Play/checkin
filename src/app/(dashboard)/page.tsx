@@ -2,7 +2,7 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getCurrentWeekCheckIn } from "@/actions/check-ins";
-import { getMyGoals, getGoalsForUser } from "@/actions/goals";
+import { getMyGoals, getGoalsForUser, getTeamGoals } from "@/actions/goals";
 import { getMoodTrend, getTeamStatus, getCompletionRate } from "@/lib/dashboard";
 import { MoodTrendChart } from "@/components/dashboard/mood-trend-chart";
 import { TeamStatusTable } from "@/components/dashboard/team-status-table";
@@ -41,12 +41,15 @@ export default async function HomePage({
   );
 
   if (effectiveView === "me") {
-    const [currentWeek, goals, trend, shoutoutCounts] = await Promise.all([
+    const [currentWeek, goals, teamGoals, trend, shoutoutCounts] = await Promise.all([
       getCurrentWeekCheckIn(),
       getMyGoals(),
+      getTeamGoals(),
       getMoodTrend([session.user.id]),
       getShoutoutCountsForUser(session.user.id),
     ]);
+    // Team goals I already own show up in "My goals" above — don't duplicate them here.
+    const othersTeamGoals = teamGoals.filter((g) => g.ownerId !== session.user.id);
 
     return (
       <div className="max-w-6xl space-y-8">
@@ -67,6 +70,12 @@ export default async function HomePage({
           <h2 className="text-sm font-semibold text-neutral-900">My goals</h2>
           <GoalsSummary goals={goals} emptyHref="/goals/new" />
         </div>
+        {othersTeamGoals.length > 0 && (
+          <div className="space-y-3">
+            <h2 className="text-sm font-semibold text-neutral-900">Team goals</h2>
+            <GoalsSummary goals={othersTeamGoals} />
+          </div>
+        )}
       </div>
     );
   }
@@ -120,7 +129,9 @@ export default async function HomePage({
             <span>
               Status:{" "}
               {status.atRisk ? (
-                <span className="font-medium text-red-600">At risk</span>
+                <span title={status.atRiskReason ?? undefined} className="cursor-help font-medium text-red-600">
+                  At risk
+                </span>
               ) : (
                 <span className="font-medium text-emerald-600">OK</span>
               )}

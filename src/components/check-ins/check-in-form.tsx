@@ -45,6 +45,11 @@ export function CheckInForm({
     e.preventDefault();
     setError(null);
 
+    if (mood == null || energy == null) {
+      setError("Please select both a mood and an energy score.");
+      return;
+    }
+
     const responses = questions
       .filter((q) => q.type === "TEXT")
       .map((q) => ({ questionId: q.id, textValue: texts[q.id] || undefined }));
@@ -74,8 +79,18 @@ export function CheckInForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <ScaleField label="Mood this week" value={mood} onChange={setMood} />
-      <ScaleField label="Energy this week" value={energy} onChange={setEnergy} />
+      <ScaleField
+        label="Mood this week"
+        hint="How you've generally felt — your overall satisfaction and outlook."
+        value={mood}
+        onChange={setMood}
+      />
+      <ScaleField
+        label="Energy this week"
+        hint="How energised or drained you've felt — your capacity to get things done."
+        value={energy}
+        onChange={setEnergy}
+      />
 
       {showLowScorePrompt && (
         <div className="card space-y-1.5 border-l-4 border-l-amber-300 p-4">
@@ -159,16 +174,19 @@ export function CheckInForm({
 
 function ScaleField({
   label,
+  hint,
   value,
   onChange,
 }: {
   label: string;
+  hint?: string;
   value: number | undefined;
   onChange: (v: number) => void;
 }) {
   return (
     <div className="space-y-1.5">
       <label className="text-sm font-medium text-neutral-700">{label}</label>
+      {hint && <p className="text-xs text-neutral-500">{hint}</p>}
       <div className="flex gap-2">
         {SCALE_VALUES.map((v) => (
           <button
